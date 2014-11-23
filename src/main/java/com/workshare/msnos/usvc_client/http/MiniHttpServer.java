@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 
 import com.sun.net.httpserver.HttpServer;
+import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc.api.RestApi;
 import com.workshare.msnos.usvc.api.RestApi.Type;
@@ -18,11 +19,11 @@ public class MiniHttpServer {
     private HttpServer httpServer;
     private RestApi[] apis;
 
-    public MiniHttpServer(Microservice micro, int port) throws IOException {
+    public MiniHttpServer(Microcloud cloud, Microservice micro, int port) throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(port), 0);
         httpServer.createContext(URI_HEALTH, new HealthcheckHandler());
         httpServer.createContext(URI_GREET, new GreeterHandler(micro));
-        httpServer.createContext(URI_MSNOS, new MsnosHandler(micro.getCloud()));
+        httpServer.createContext(URI_MSNOS, new MsnosHandler(cloud));
         
         apis = new RestApi[] {
             new RestApi("health", URI_HEALTH, port).asHealthCheck(),

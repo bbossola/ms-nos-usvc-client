@@ -30,7 +30,7 @@ public class Server {
     public Server(String name, int port) throws IOException {
         cloud = createMicrocloud();
         micro = new Microservice(name);
-        http = new MiniHttpServer(micro, port);
+        http = new MiniHttpServer(cloud, micro, port);
         commands = createCommands(cloud, micro, http);
 
         Runtime.getRuntime().addShutdownHook(new Thread(){
@@ -78,7 +78,7 @@ public class Server {
 
     private void showMenu() {
         System.out.println();
-        for (int i = 1; i < commands.length; i++) {
+        for (int i = 0; i < commands.length; i++) {
             System.out.printf("%d) %s\n", i, commands[i].description());
         }
 
@@ -96,11 +96,11 @@ public class Server {
     
     private Command[] createCommands(Microcloud cloud, Microservice usvc, MiniHttpServer http) {
         Command[] commands = {
-            new InvalidCommand(),
-
-            new StatusCommand(micro),
+            new StatusCommand(cloud, micro),
             new JoinCommand(cloud, micro, http.apis()),
             new LeaveCommand(micro),
+            new ENQCommand(cloud, micro),
+            new PingCommand(cloud, micro),
 
             new LogLevelControlCommand(),
             new ExitCommand(),
