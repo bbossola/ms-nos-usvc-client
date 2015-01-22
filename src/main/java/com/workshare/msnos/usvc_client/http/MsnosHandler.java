@@ -42,13 +42,14 @@ public class MsnosHandler implements HttpHandler {
             } finally {
                 reader.close();
             }
+
         } catch (Exception ex) {
             log.warn("Error handling http request", ex);
             exchange.sendResponseHeaders(400, 0);
         }
 
         exchange.sendResponseHeaders(200, 0);
-
+        exchange.getResponseBody().close();
     }
 
     private String getRequestEncoding(HttpExchange exchange, String defval) {

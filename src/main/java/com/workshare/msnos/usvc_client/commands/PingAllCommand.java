@@ -12,12 +12,12 @@ import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc_client.Command;
 
-public class PingCommand implements Command {
+public class PingAllCommand implements Command {
 
     private final Cloud cloud;
     private final Agent local;
     
-    public PingCommand(Microcloud ucloud, Microservice usvc) {
+    public PingAllCommand(Microcloud ucloud, Microservice usvc) {
         super();
         this.cloud = ucloud.getCloud();
         this.local = usvc.getAgent();

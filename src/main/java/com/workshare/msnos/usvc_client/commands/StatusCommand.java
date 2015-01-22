@@ -42,6 +42,7 @@ public class StatusCommand implements Command {
 
         Console.out.println();
         Console.out.println("= Local microservice");
+        Console.out.println("Joined: " + ((usvc.getCloud() == null) ? "NO": "Yes"));
         dump("", usvc, true);
 
         List<RemoteMicroservice> remoteServices = cloud.getMicroServices();

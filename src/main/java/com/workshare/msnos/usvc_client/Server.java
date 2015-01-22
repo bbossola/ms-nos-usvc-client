@@ -32,18 +32,6 @@ public class Server {
         micro = new Microservice(name);
         http = new MiniHttpServer(cloud, micro, port);
         commands = createCommands(cloud, micro, http);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(){
-            @Override
-            public void run() {
-                http.stop();
-                try {
-                    micro.leave();
-                } catch (MsnosException ignore) {
-                }
-            }
-        });
-
     }
     
     public void run() throws IOException {
@@ -100,7 +88,8 @@ public class Server {
             new JoinCommand(cloud, micro, http.apis()),
             new LeaveCommand(micro),
             new ENQCommand(cloud, micro),
-            new PingCommand(cloud, micro),
+            new PingAllCommand(cloud, micro),
+            new PingUsvcCommand(cloud, micro),
 
             new LogLevelControlCommand(),
             new ExitCommand(),

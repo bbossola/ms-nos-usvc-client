@@ -26,9 +26,9 @@ public class MiniHttpServer {
         httpServer.createContext(URI_MSNOS, new MsnosHandler(cloud));
         
         apis = new RestApi[] {
-            new RestApi("health", URI_HEALTH, port).asHealthCheck(),
-            new RestApi("hello", URI_GREET, port),
-            new RestApi("msnos", URI_MSNOS, port, null, Type.MSNOS_HTTP, false),
+            new RestApi("sample", URI_HEALTH, port).asHealthCheck(),
+            new RestApi("sample", URI_GREET, port),
+            new RestApi("sample", URI_MSNOS, port, null, Type.MSNOS_HTTP, false),
         };
     }
 
