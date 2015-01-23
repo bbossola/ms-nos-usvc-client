@@ -21,7 +21,9 @@ public class PingUsvcCommand implements Command {
     private final Microcloud ucloud;
     private final Microservice usvc;
     private final ArrayBlockingQueue<Message> pongs;
-    
+
+    private volatile boolean running = false;
+
     public PingUsvcCommand(Microcloud ucloud, Microservice usvc) {
         super();
         this.ucloud = ucloud;
@@ -31,6 +33,9 @@ public class PingUsvcCommand implements Command {
         ucloud.addListener(new Listener() {
             @Override
             public void onMessage(Message message) {
+                if (!running)
+                    return;
+                
                 if (message.getType() == Message.Type.PON)
                     try {
                         pongs.put(message);
@@ -47,6 +52,16 @@ public class PingUsvcCommand implements Command {
 
     @Override
     public void execute() throws Exception {
+        running = true;
+        try {
+            doExecute();
+        } finally {
+            running = false;
+        }
+        
+    }
+    
+    public void doExecute() throws Exception {
         Console.out.print("Enter the name of the agent: ");
         Console.out.flush();
         String name = Console.in.readLine().trim();
@@ -71,11 +86,10 @@ public class PingUsvcCommand implements Command {
             Console.out.println("= Gates: "+receipt.getGate());
             Console.out.println("= Status: "+receipt.getStatus());
 
-            if (pong == null)
-                while((pong=pongs.poll()) != null)
-                    if (pong.getFrom().equals(agent.getIden())) {
-                        break;
-                }
+            while((pong=pongs.poll()) != null)
+                if (pong.getFrom().equals(agent.getIden())) {
+                    break;
+            }
             
             if (pong != null) {
                 Console.out.println("= Pong: received! "+pong);

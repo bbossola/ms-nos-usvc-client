@@ -38,7 +38,7 @@ public class MsnosHandler implements HttpHandler {
             try {
                 Message message = serializer.fromReader(reader, Message.class);
                 log.debug("Received message {}", message);
-                cloud.process(message);
+                cloud.process(message, "HTTP");
             } finally {
                 reader.close();
             }
