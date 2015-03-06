@@ -22,11 +22,14 @@ public class GreeterHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         StringBuilder sb = new StringBuilder();
         sb.append("Hello ");
-        sb.append(getQueryParameter(exchange, "name"));
+        sb.append(getQueryParameter(exchange, "name", "anonymous"));
+        sb.append(", here is ");
+        sb.append(usvc.getName());
         if (usvc.getLocation() != Location.UNKNOWN) {
-            sb.append(" from ");
+            sb.append(" speaking from ");
             sb.append(usvc.getLocation());
         }
+        sb.append("\n");
         
         respond(exchange, sb.toString(), "text/plain", 200);
     }
@@ -44,9 +47,8 @@ public class GreeterHandler implements HttpHandler {
         responseBody.close();
     }
 
-    private Object getQueryParameter(HttpExchange exchange, String string) {
-        // TODO Auto-generated method stub
-        return null;
+    private String getQueryParameter(HttpExchange exchange, String string, String defaultName) {
+        return defaultName;
     }
 
 }

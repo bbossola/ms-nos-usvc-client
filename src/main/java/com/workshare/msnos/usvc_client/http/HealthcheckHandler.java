@@ -20,11 +20,11 @@ public class HealthcheckHandler implements HttpHandler {
         } else {
             byte[] content = "{\"result\":\"ok\"}".getBytes();
     
+            exchange.sendResponseHeaders ( 200, content.length);
+
             final OutputStream responseBody = exchange.getResponseBody();
             responseBody.write(content);
             responseBody.close();
-        
-            exchange.sendResponseHeaders ( 200, content.length);
         }
     }
 }
