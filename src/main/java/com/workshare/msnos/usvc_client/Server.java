@@ -90,6 +90,7 @@ public class Server {
             new ENQCommand(cloud, micro),
             new PingAllCommand(cloud, micro),
             new PingUsvcCommand(cloud, micro),
+            new RingsCommand(cloud, micro),
 
             new LogLevelControlCommand(),
             new ExitCommand(),

@@ -12,6 +12,7 @@ import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.workshare.msnos.core.Message;
+import com.workshare.msnos.core.protocols.ip.Endpoint;
 import com.workshare.msnos.core.serializers.WireJsonSerializer;
 import com.workshare.msnos.usvc.Microcloud;
 
@@ -38,7 +39,7 @@ public class MsnosHandler implements HttpHandler {
             try {
                 Message message = serializer.fromReader(reader, Message.class);
                 log.debug("Received message {}", message);
-                cloud.process(message, "HTTP");
+                cloud.process(message, Endpoint.Type.HTTP);
             } finally {
                 reader.close();
             }
