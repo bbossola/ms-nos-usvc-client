@@ -66,11 +66,11 @@ public class Server {
 
     private void showMenu() {
         System.out.println();
+        System.out.println("Action? ");
         for (int i = 0; i < commands.length; i++) {
             System.out.printf("%d) %s\n", i, commands[i].description());
         }
 
-        System.out.printf("Action? ");
         System.out.flush();
     }
 
