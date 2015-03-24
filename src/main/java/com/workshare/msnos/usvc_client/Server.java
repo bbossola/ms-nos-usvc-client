@@ -93,7 +93,7 @@ public class Server {
             new RingsCommand(cloud, micro),
 
             new LogLevelControlCommand(),
-            new ExitCommand(),
+            new ExitCommand(new LeaveCommand(micro)),
         };
         
         return commands;

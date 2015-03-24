@@ -19,7 +19,8 @@ public class LeaveCommand implements Command {
 
     @Override
     public void execute() throws Exception {
-        usvc.leave();
+        if (usvc.getCloud() != null)
+            usvc.leave();
     }
 
 }
