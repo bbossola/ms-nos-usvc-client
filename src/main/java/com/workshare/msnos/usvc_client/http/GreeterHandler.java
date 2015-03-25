@@ -21,15 +21,7 @@ public class GreeterHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         StringBuilder sb = new StringBuilder();
-        sb.append("Hello ");
-        sb.append(getQueryParameter(exchange, "name", "anonymous"));
-        sb.append(", here is ");
-        sb.append(usvc.getName());
-        if (usvc.getLocation() != Location.UNKNOWN) {
-            sb.append(" speaking from ");
-            sb.append(usvc.getLocation());
-        }
-        sb.append("\n");
+        sayHello(getQueryParameter(exchange, "name", "anonymous"), usvc, sb);
         
         respond(exchange, sb.toString(), "text/plain", 200);
     }
@@ -50,5 +42,18 @@ public class GreeterHandler implements HttpHandler {
     private String getQueryParameter(HttpExchange exchange, String string, String defaultName) {
         return defaultName;
     }
+
+    static void sayHello(final String to, final Microservice from, StringBuilder buffer) {
+        buffer.append("Hello ");
+        buffer.append(to);
+        buffer.append(", here is ");
+        buffer.append(from.getName());
+        if (from.getLocation() != Location.UNKNOWN) {
+            buffer.append(" speaking from ");
+            buffer.append(from.getLocation());
+        }
+        buffer.append("\n");
+    }
+
 
 }
