@@ -84,6 +84,7 @@ public class Server {
             new JoinCommand(cloud, micro, http.apis()),
             new LeaveCommand(micro),
             new ENQCommand(cloud, micro),
+            new DSCCommand(cloud, micro),
             new PingAllCommand(cloud, micro),
             new PingUsvcCommand(cloud, micro),
             new RingsCommand(cloud, micro),
