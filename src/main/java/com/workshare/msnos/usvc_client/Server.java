@@ -16,10 +16,6 @@ import java.util.logging.Logger;
 
 public class Server {
 
-    static {
-        LogLevelControlCommand.setCurrentLevel(Level.INFO);
-    }
-
     private static final Logger logger = Logger.getLogger("com.workshare");
 
     private final Microcloud cloud;
@@ -92,7 +88,7 @@ public class Server {
             new PingUsvcCommand(cloud, micro),
             new RingsCommand(cloud, micro),
 
-            new LogLevelControlCommand(),
+            new ProtocolLogControl(),
             new ExitCommand(new LeaveCommand(micro)),
         };
         

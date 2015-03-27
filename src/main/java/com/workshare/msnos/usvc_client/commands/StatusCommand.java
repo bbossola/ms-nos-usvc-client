@@ -100,7 +100,9 @@ public class StatusCommand implements Command {
 
     private void dump(final String prefix, final Agent agent) {
 
-        Console.out.println(prefix + "Agent: " + agent.getIden().getUUID());
+        final IMicroService micro = findMicroservice(agent);
+
+        Console.out.println(prefix + "Agent: " + agent.getIden().getUUID() + " (usvc: "+(micro == null ? "n/a" : micro.getName())+")");
         Console.out.println(prefix + "  Last seen: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date(agent.getAccessTime())));
 
         final Set<Endpoint> points = agent.getEndpoints();
@@ -110,5 +112,20 @@ public class StatusCommand implements Command {
         }
 
         Console.out.println();
+    }
+
+    private IMicroService findMicroservice(Agent agent) {
+        if (usvc.getAgent().equals(agent)) {
+            return usvc;
+        }
+
+        List<RemoteMicroservice> services = cloud.getMicroServices();
+        for (RemoteMicroservice service : services) {
+            if (service.getAgent().equals(agent)) {
+                return service;
+            }
+        }
+
+        return null;
     }
 }

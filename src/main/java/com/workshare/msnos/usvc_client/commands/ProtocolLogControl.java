@@ -1,22 +1,23 @@
 package com.workshare.msnos.usvc_client.commands;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+
+import ch.qos.logback.classic.Level;
 
 import com.workshare.msnos.usvc_client.Command;
 import com.workshare.msnos.usvc_client.Console;
 
-public class LogLevelControlCommand implements Command {
+public class ProtocolLogControl implements Command {
 
 	@Override
 	public String description() {
-		return "Change log level";
+		return "Change protocol log level";
 	}
 
 	@Override
 	public void execute() throws Exception {
 		Console.out.printf("Current level: %s\n", toString(getCurrentLevel()));
-		Console.out.printf("New level? [sev/war/inf/fin] ");
+		Console.out.printf("New level? [w]ar/[i]nf/[d]eb ");
 		
 		String line = Console.in.readLine();
 		Level level = fromString(line);
@@ -24,21 +25,22 @@ public class LogLevelControlCommand implements Command {
 		if (level != null) {
 			setCurrentLevel(level);
 			Console.out.printf("New level: %s\n",toString(level));
+            Console.out.println();
 		}
 		else
-			Console.out.printf("Level unchanged");
+			Console.out.println("Level unchanged");
 	}
 
 	public static Level getCurrentLevel() {
-		return Logger.getLogger("com.gridprobe").getLevel();
+		return ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger("protocol")).getLevel();
 	}
 
 	public static void setCurrentLevel(Level level) {
-		Logger.getLogger("com.gridprobe").setLevel(level);
+        ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger("protocol")).setLevel(level);
 	}
 
 	public String toString(Level level) {
-		return level.getName();
+		return level.toString();
 	}
 	
 	public Level fromString(String s) {
@@ -52,14 +54,14 @@ public class LogLevelControlCommand implements Command {
 		s = s.toLowerCase();
 		
 		Level result;
-		if (s.startsWith("sev"))
-			result = Level.SEVERE;
-		else if (s.startsWith("war"))
-			result = Level.WARNING;
-		else if (s.startsWith("inf"))
+		if (s.startsWith("w"))
+			result = Level.WARN;
+		else if (s.startsWith("i"))
 			result = Level.INFO;
+		else if (s.startsWith("d"))
+			result = Level.DEBUG;
 		else 
-			result = Level.FINEST;
+		    throw new RuntimeException("Invalid level name: "+s);
 		
 		return result;
 	}
