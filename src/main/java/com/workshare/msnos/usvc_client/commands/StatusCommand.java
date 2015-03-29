@@ -81,7 +81,7 @@ public class StatusCommand implements Command {
         Console.out.println(prefix + "- Apis: " + apis.size());
         for (RestApi api : apis) {
             String isfaulty = api.isFaulty() ? " (faulty)" : "";
-            Console.out.println(prefix + "  - " + api.getName() + ":" + api.getPath() + isfaulty+ " ["+api.getUrl()+"]");
+            Console.out.println(prefix + "  - " + api.getPath() + ":" + isfaulty+ " ["+api.getUrl()+"]");
         }
         Console.out.println();
     }
@@ -91,8 +91,8 @@ public class StatusCommand implements Command {
         Collections.sort(apis, new Comparator<RestApi>(){
             @Override
             public int compare(RestApi a1, RestApi a2) {
-                String n1 = a1.getName() + a1.getPath();
-                String n2 = a2.getName() + a2.getPath();
+                String n1 = a1.getPath();
+                String n2 = a2.getPath();
                 return n1.compareTo(n2);
             }});
         return apis;

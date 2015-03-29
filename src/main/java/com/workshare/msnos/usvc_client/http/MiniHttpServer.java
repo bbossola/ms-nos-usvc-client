@@ -8,7 +8,6 @@ import com.sun.net.httpserver.HttpServer;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc.api.RestApi;
-import com.workshare.msnos.usvc.api.RestApi.Type;
 
 @SuppressWarnings("restriction")
 public class MiniHttpServer {
@@ -32,10 +31,10 @@ public class MiniHttpServer {
         httpServer.createContext(URI_MSNOS, new MsnosHandler(cloud));
         
         apis = new RestApi[] {
-            new RestApi("sample", URI_GREET, port),
-            new RestApi("sample", URI_WASSUP, port),
-            new RestApi("sample", URI_HEALTH, port).asHealthCheck(),
-            new RestApi("sample", URI_MSNOS, port, null, Type.MSNOS_HTTP, false),
+            new RestApi(URI_GREET, port),
+            new RestApi(URI_WASSUP, port),
+            new RestApi(URI_HEALTH, port).asHealthCheck(),
+            new RestApi(URI_MSNOS, port).asMsnosEndpoint(),
         };
 
         httpServer.createContext(URI_ADMIN_MESSAGES, new MsnosLogger(cloud));
