@@ -2,6 +2,7 @@ package com.workshare.msnos.usvc_client.http;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.concurrent.Executors;
 
 import com.sun.net.httpserver.HttpServer;
 import com.workshare.msnos.usvc.Microcloud;
@@ -17,11 +18,14 @@ public class MiniHttpServer {
     public static final String URI_GREET = "/hello";
     public static final String URI_MSNOS = "/msnos";
 
+    public static final String URI_ADMIN_MESSAGES = "/admin/messages";
+
     private HttpServer httpServer;
     private RestApi[] apis;
 
     public MiniHttpServer(Microcloud cloud, Microservice micro, int port) throws IOException {
         httpServer = HttpServer.create(new InetSocketAddress(port), 0);
+        httpServer.setExecutor(Executors.newCachedThreadPool());
         httpServer.createContext(URI_WASSUP, new WassupHandler(micro));
         httpServer.createContext(URI_HEALTH, new HealthcheckHandler());
         httpServer.createContext(URI_GREET, new GreeterHandler(micro));
@@ -33,6 +37,8 @@ public class MiniHttpServer {
             new RestApi("sample", URI_HEALTH, port).asHealthCheck(),
             new RestApi("sample", URI_MSNOS, port, null, Type.MSNOS_HTTP, false),
         };
+
+        httpServer.createContext(URI_ADMIN_MESSAGES, new MsnosLogger(cloud));
     }
 
     public void start() {
