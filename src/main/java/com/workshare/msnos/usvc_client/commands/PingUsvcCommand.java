@@ -10,7 +10,7 @@ import com.workshare.msnos.core.Message.Status;
 import com.workshare.msnos.core.Message.Type;
 import com.workshare.msnos.core.MessageBuilder;
 import com.workshare.msnos.core.Receipt;
-import com.workshare.msnos.usvc.IMicroService;
+import com.workshare.msnos.usvc.IMicroservice;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc_client.Command;
@@ -66,7 +66,7 @@ public class PingUsvcCommand implements Command {
         Console.out.flush();
         String name = Console.in.readLine().trim();
 
-        IMicroService target = find(name);
+        IMicroservice target = find(name);
         if (target == null) {
             Console.out.println("Sorry, target ["+name+" not found!");
             return;
@@ -104,16 +104,16 @@ public class PingUsvcCommand implements Command {
         }
     }
 
-    private IMicroService find(String name) {
-        IMicroService res = find(name, ucloud.getMicroServices());
+    private IMicroservice find(String name) {
+        IMicroservice res = find(name, ucloud.getMicroServices());
         if (res == null)
             res = find(name, ucloud.getPassiveServices());
         
         return res;
     }
 
-    private IMicroService find(String name, List<? extends IMicroService> micros) {
-        for (IMicroService micro : micros) {
+    private IMicroservice find(String name, List<? extends IMicroservice> micros) {
+        for (IMicroservice micro : micros) {
             if (name.equals(micro.getName()))
                 return micro;
         }

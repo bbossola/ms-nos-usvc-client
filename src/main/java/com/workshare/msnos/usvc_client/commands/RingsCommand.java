@@ -13,7 +13,7 @@ import com.workshare.msnos.core.Agent;
 import com.workshare.msnos.core.Cloud;
 import com.workshare.msnos.core.Ring;
 import com.workshare.msnos.core.protocols.ip.Endpoint;
-import com.workshare.msnos.usvc.IMicroService;
+import com.workshare.msnos.usvc.IMicroservice;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc.RemoteMicroservice;
@@ -81,7 +81,7 @@ public class RingsCommand implements Command {
 
         Console.out.println(prefix + "Agent: " + agent.getIden().getUUID());
        
-        IMicroService uservice = findMicroservice(agent);
+        IMicroservice uservice = findMicroservice(agent);
         if (uservice != null)
             Console.out.println(prefix + "  UService: " + uservice.getName());
 
@@ -96,7 +96,7 @@ public class RingsCommand implements Command {
         Console.out.println();
     }
 
-    private IMicroService findMicroservice(Agent agent) {
+    private IMicroservice findMicroservice(Agent agent) {
         if (micro.getAgent().equals(agent)) {
             return micro;
         }

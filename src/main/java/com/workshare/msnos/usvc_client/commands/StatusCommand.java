@@ -13,7 +13,7 @@ import com.workshare.msnos.core.Agent;
 import com.workshare.msnos.core.Cloud;
 import com.workshare.msnos.core.RemoteAgent;
 import com.workshare.msnos.core.protocols.ip.Endpoint;
-import com.workshare.msnos.usvc.IMicroService;
+import com.workshare.msnos.usvc.IMicroservice;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc.RemoteMicroservice;
@@ -61,7 +61,7 @@ public class StatusCommand implements Command {
 
     }
 
-    private void dump(String prefix, IMicroService usvc, boolean withAgentDetails) {
+    private void dump(String prefix, IMicroservice usvc, boolean withAgentDetails) {
         Console.out.println(prefix + "Name: " + usvc.getName());
         Console.out.println(prefix + "Location: " + usvc.getLocation());
 
@@ -86,7 +86,7 @@ public class StatusCommand implements Command {
         Console.out.println();
     }
 
-    private List<RestApi> listApis(IMicroService usvc) {
+    private List<RestApi> listApis(IMicroservice usvc) {
         List<RestApi> apis = new ArrayList<RestApi>(usvc.getApis());
         Collections.sort(apis, new Comparator<RestApi>(){
             @Override
@@ -100,7 +100,7 @@ public class StatusCommand implements Command {
 
     private void dump(final String prefix, final Agent agent) {
 
-        final IMicroService micro = findMicroservice(agent);
+        final IMicroservice micro = findMicroservice(agent);
 
         Console.out.println(prefix + "Agent: " + agent.getIden().getUUID() + " (usvc: "+(micro == null ? "n/a" : micro.getName())+")");
         Console.out.println(prefix + "  Last seen: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date(agent.getAccessTime())));
@@ -114,7 +114,7 @@ public class StatusCommand implements Command {
         Console.out.println();
     }
 
-    private IMicroService findMicroservice(Agent agent) {
+    private IMicroservice findMicroservice(Agent agent) {
         if (usvc.getAgent().equals(agent)) {
             return usvc;
         }
