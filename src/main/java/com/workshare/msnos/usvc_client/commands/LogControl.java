@@ -7,17 +7,23 @@ import ch.qos.logback.classic.Level;
 import com.workshare.msnos.usvc_client.Command;
 import com.workshare.msnos.usvc_client.Console;
 
-public class ProtocolLogControl implements Command {
+public class LogControl implements Command {
 
+    private final String name;
+
+    public LogControl(String name) {
+        this.name = name;
+    }
+    
 	@Override
 	public String description() {
-		return "Change protocol log level";
+		return "Change "+name+" log level";
 	}
 
 	@Override
 	public void execute() throws Exception {
 		Console.out.printf("Current level: %s\n", toString(getCurrentLevel()));
-		Console.out.printf("New level? [w]ar/[i]nf/[d]eb ");
+		Console.out.printf("New level? [e]rr/[w]ar/[i]nf/[d]eb ");
 		
 		String line = Console.in.readLine();
 		Level level = fromString(line);
@@ -31,12 +37,12 @@ public class ProtocolLogControl implements Command {
 			Console.out.println("Level unchanged");
 	}
 
-	public static Level getCurrentLevel() {
-		return ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger("protocol")).getLevel();
+	public Level getCurrentLevel() {
+		return ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(name)).getLevel();
 	}
 
-	public static void setCurrentLevel(Level level) {
-        ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger("protocol")).setLevel(level);
+	public void setCurrentLevel(Level level) {
+        ((ch.qos.logback.classic.Logger)LoggerFactory.getLogger(name)).setLevel(level);
 	}
 
 	public String toString(Level level) {
@@ -54,7 +60,9 @@ public class ProtocolLogControl implements Command {
 		s = s.toLowerCase();
 		
 		Level result;
-		if (s.startsWith("w"))
+        if (s.startsWith("e"))
+            result = Level.ERROR;
+        else if (s.startsWith("w"))
 			result = Level.WARN;
 		else if (s.startsWith("i"))
 			result = Level.INFO;

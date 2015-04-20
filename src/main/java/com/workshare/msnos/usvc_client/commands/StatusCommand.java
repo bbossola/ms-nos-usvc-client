@@ -25,24 +25,27 @@ public class StatusCommand implements Command {
 
     private final Microservice usvc;
     private final Microcloud cloud;
+    private final boolean detailed;
 
-    public StatusCommand(Microcloud ucloud, Microservice usvc) {
+    public StatusCommand(Microcloud ucloud, Microservice usvc, boolean detailed) {
         super();
         this.usvc = usvc;
         this.cloud = ucloud;
+        this.detailed = detailed;
     }
 
     @Override
     public String description() {
-        return "Cloud status";
+        return "Cloud status"+(detailed ? " (detailed) " : "");
     }
 
     @Override
     public void execute() throws Exception {
 
         Console.out.println();
-        Console.out.println("= Local microservice");
-        Console.out.println("Joined: " + ((usvc.getCloud() == null) ? "NO": "Yes"));
+        Console.out.print("= Local microservice");
+        Console.out.print(" - Joined: " + ((usvc.getCloud() == null) ? "NO": "Yes"));
+        Console.out.println();
         dump("", usvc, true);
 
         List<RemoteMicroservice> remoteServices = cloud.getMicroServices();
@@ -52,21 +55,23 @@ public class StatusCommand implements Command {
         }
         Console.out.println();
 
-        Cloud grid = cloud.getCloud();
-        final Collection<RemoteAgent> remoteAgents = grid.getRemoteAgents();
-        Console.out.println("= Remote Agents: " + remoteAgents.size());
-        for (Agent agent : remoteAgents) {
-            dump("  ", agent);
+        if (detailed) {
+            Cloud grid = cloud.getCloud();
+            final Collection<RemoteAgent> remoteAgents = grid.getRemoteAgents();
+            Console.out.println("= Remote Agents: " + remoteAgents.size());
+            for (Agent agent : remoteAgents) {
+                dump("  ", agent);
+            }
         }
-
     }
 
     private void dump(String prefix, IMicroservice usvc, boolean withAgentDetails) {
-        Console.out.println(prefix + "Name: " + usvc.getName());
-        Console.out.println(prefix + "Location: " + usvc.getLocation());
-
         final Agent agent = usvc.getAgent();
-        Console.out.println(prefix + "Agent: " + agent.getIden().getUUID());
+
+        Console.out.print(prefix + "Name: " + usvc.getName());
+        Console.out.print(" - Location: " + usvc.getLocation());
+        Console.out.print(" - Agent: " + agent.getIden().getUUID());
+        Console.out.println();
 
         if (withAgentDetails) {
             Console.out.println(prefix + "- Last seen: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date(agent.getAccessTime())));

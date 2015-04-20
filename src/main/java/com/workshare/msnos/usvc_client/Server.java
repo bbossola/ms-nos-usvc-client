@@ -1,6 +1,7 @@
 package com.workshare.msnos.usvc_client;
 
 import com.workshare.msnos.core.Cloud;
+import com.workshare.msnos.core.Message;
 import com.workshare.msnos.core.MsnosException;
 import com.workshare.msnos.core.security.KeysStore;
 import com.workshare.msnos.core.security.Signer;
@@ -80,16 +81,20 @@ public class Server {
     
     private Command[] createCommands(Microcloud cloud, Microservice usvc, MiniHttpServer http) {
         Command[] commands = {
-            new StatusCommand(cloud, micro),
+            new StatusCommand(cloud, micro, false),
             new JoinCommand(cloud, micro, http.apis()),
             new LeaveCommand(micro),
-            new ENQCommand(cloud, micro),
-            new DSCCommand(cloud, micro),
+            new SendToCloudCommand(cloud, micro, Message.Type.DSC),
+            new SendToCloudCommand(cloud, micro, Message.Type.ENQ),
             new PingAllCommand(cloud, micro),
-            new PingUsvcCommand(cloud, micro),
+            new TxRxUsvcCommand(cloud, micro, Message.Type.PIN, Message.Type.PON),
+            new TxRxUsvcCommand(cloud, micro, Message.Type.TRC, Message.Type.ACK),
             new RingsCommand(cloud, micro),
+            new UpdateCommand(cloud),
+            new StatusCommand(cloud, micro, true),
 
-            new ProtocolLogControl(),
+            new LogControl("protocol"),
+            new LogControl("routing"),
             new ExitCommand(new LeaveCommand(micro)),
         };
         

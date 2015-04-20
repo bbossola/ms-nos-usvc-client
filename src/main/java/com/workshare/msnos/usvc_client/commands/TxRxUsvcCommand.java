@@ -16,38 +16,47 @@ import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc_client.Command;
 import com.workshare.msnos.usvc_client.Console;
 
-public class PingUsvcCommand implements Command {
+public class TxRxUsvcCommand implements Command {
 
     private final Microcloud ucloud;
     private final Microservice usvc;
-    private final ArrayBlockingQueue<Message> pongs;
+    private final ArrayBlockingQueue<Message> received;
 
     private volatile boolean running = false;
+    private final Type tosend;
+    private final Type expect;
 
-    public PingUsvcCommand(Microcloud ucloud, Microservice usvc) {
+    public TxRxUsvcCommand(Microcloud ucloud, Microservice usvc) {
+        this(ucloud, usvc, Message.Type.PIN, Message.Type.PON);
+    }
+
+    public TxRxUsvcCommand(Microcloud ucloud, Microservice usvc, Type totx, Type torx) {
         super();
         this.ucloud = ucloud;
-        this.usvc= usvc;
-        this.pongs = new ArrayBlockingQueue<Message>(10);
-        
+        this.usvc= usvc;        
+        this.tosend = totx;
+        this.expect = torx;
+        this.received = new ArrayBlockingQueue<Message>(10);
+
         ucloud.addListener(new Listener() {
             @Override
             public void onMessage(Message message) {
                 if (!running)
                     return;
                 
-                if (message.getType() == Message.Type.PON)
+                if (message.getType() == expect)
                     try {
-                        pongs.put(message);
+                        received.put(message);
                     } catch (InterruptedException e) {
                         Thread.interrupted();
                     }
             }});
     }
 
+
     @Override
     public String description() {
-        return "Sends an ping to a specific microservice";
+        return "Sends an "+tosend+" to a specific microservice, expecting "+expect;
     }
 
     @Override
@@ -72,32 +81,32 @@ public class PingUsvcCommand implements Command {
             return;
         }
         
-        pongs.clear();
+        received.clear();
         
         Agent agent = target.getAgent();
-        Console.out.println("Sending PING to service "+name+" on agent "+agent.getIden().getUUID());
-        final Message ping = new MessageBuilder(Type.PIN, usvc.getAgent(), agent).make();
-        final Receipt receipt = ucloud.send(ping);
+        Console.out.println("Sending "+tosend+" to service "+name+" on agent "+agent.getIden().getUUID());
+        final Message tx = new MessageBuilder(tosend, usvc.getAgent(), agent).make();
+        final Receipt receipt = ucloud.send(tx);
 
         Console.out.println("Message sent, waiting for PONG back...");
-        Message pong = null;
+        Message rx = null;
         long end = System.currentTimeMillis() + 20000L;
         while(end > System.currentTimeMillis()) {
             Console.out.println("= Gates: "+receipt.getGate());
             Console.out.println("= Status: "+receipt.getStatus());
 
-            while((pong=pongs.poll()) != null)
-                if (pong.getFrom().equals(agent.getIden())) {
+            while((rx=received.poll()) != null)
+                if (rx.getFrom().equals(agent.getIden())) {
                     break;
             }
             
-            if (pong != null) {
-                Console.out.println("= Pong: received! "+pong);
+            if (rx != null) {
+                Console.out.println("= Answer received! \n"+rx+"\n");
             } else {
-                Console.out.println("Pong: waiting...");
+                Console.out.println("Waiting for answer...");
             }
  
-            if (pong != null && receipt.getStatus() == Status.DELIVERED)
+            if (rx != null && receipt.getStatus() == Status.DELIVERED)
                 break;
             
             Thread.sleep(1000L);

@@ -45,7 +45,7 @@ public class RingsCommand implements Command {
         
         Console.out.println("Number of rings: " + rings.size());
         for (Ring ring : rings.keySet()) {
-            Console.out.println("  Ring: " + ring);
+            Console.out.println("- Ring: " + ring);
             Set<Agent> agents = rings.get(ring);
             for (Agent agent : agents) {
                 dump("    ", agent);

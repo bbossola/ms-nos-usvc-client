@@ -12,6 +12,18 @@
     </logger>
 
 
+	<!--  Routing logger -->
+    <appender name="routing.appender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>%-2(%d{dd MMM yyyy HH:mm:ss.SSS}) | %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="routing" level="DEBUG" additivity="false">
+        <appender-ref ref="routing.appender"/>
+    </logger>
+
+
 	<!--  main logger -->
     <appender name="main.appender" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
