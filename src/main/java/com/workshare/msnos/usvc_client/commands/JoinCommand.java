@@ -26,7 +26,12 @@ public class JoinCommand implements Command {
     @Override
     public void execute() throws Exception {
         usvc.join(cloud);
+        sleep(500);
         usvc.publish(apis);
+    }
+
+    private void sleep(int millis) throws InterruptedException {
+        Thread.sleep(millis);
     }
 
 }
