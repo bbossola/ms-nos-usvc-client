@@ -46,7 +46,7 @@ public class LogControl implements Command {
 	}
 
 	public String toString(Level level) {
-		return level.toString();
+        return (level == null) ? "unknown" : level.toString();
 	}
 	
 	public Level fromString(String s) {
