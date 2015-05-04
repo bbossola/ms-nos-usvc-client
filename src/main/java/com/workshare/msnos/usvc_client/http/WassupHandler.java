@@ -40,8 +40,8 @@ public class WassupHandler implements HttpHandler {
         }
         
         StringBuilder sb = new StringBuilder();
-        GreeterHandler.sayHello(getQueryParameter(exchange, "name", "anonymous"), usvc, sb);
-
+        sb.append(GreeterHandler.sayHello(getQueryParameter(exchange, "name", "anonymous"), usvc));
+        
         List<RemoteMicroservice> services = cloud.getMicroServices();
         sb.append("What about the others?\n");
         if (!services.isEmpty()) {
@@ -55,6 +55,7 @@ public class WassupHandler implements HttpHandler {
         } else {
             sb.append("Awww... we are alone!\n");
         }
+        
         respond(exchange, sb.toString(), "text/plain", 200);
     }
 

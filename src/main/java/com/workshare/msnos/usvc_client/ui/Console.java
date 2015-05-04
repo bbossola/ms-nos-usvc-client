@@ -1,4 +1,4 @@
-package com.workshare.msnos.usvc_client;
+package com.workshare.msnos.usvc_client.ui;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

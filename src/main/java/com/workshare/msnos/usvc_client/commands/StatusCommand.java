@@ -19,7 +19,7 @@ import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc.RemoteMicroservice;
 import com.workshare.msnos.usvc.api.RestApi;
 import com.workshare.msnos.usvc_client.Command;
-import com.workshare.msnos.usvc_client.Console;
+import com.workshare.msnos.usvc_client.ui.Console;
 
 public class StatusCommand implements Command {
 

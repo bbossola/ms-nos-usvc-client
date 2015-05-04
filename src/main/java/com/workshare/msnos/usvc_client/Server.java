@@ -1,5 +1,10 @@
 package com.workshare.msnos.usvc_client;
 
+import java.io.IOException;
+import java.util.UUID;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import com.workshare.msnos.core.Cloud;
 import com.workshare.msnos.core.Message;
 import com.workshare.msnos.core.MsnosException;
@@ -7,13 +12,24 @@ import com.workshare.msnos.core.security.KeysStore;
 import com.workshare.msnos.core.security.Signer;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
-import com.workshare.msnos.usvc_client.commands.*;
+import com.workshare.msnos.usvc_client.commands.ExitCommand;
+import com.workshare.msnos.usvc_client.commands.FlipHealthcheckFaulty;
+import com.workshare.msnos.usvc_client.commands.FlipHelloApiFaulty;
+import com.workshare.msnos.usvc_client.commands.JoinCommand;
+import com.workshare.msnos.usvc_client.commands.LeaveCommand;
+import com.workshare.msnos.usvc_client.commands.ListEndpointsCommand;
+import com.workshare.msnos.usvc_client.commands.LogControl;
+import com.workshare.msnos.usvc_client.commands.PingAllCommand;
+import com.workshare.msnos.usvc_client.commands.RingsCommand;
+import com.workshare.msnos.usvc_client.commands.SendToCloudCommand;
+import com.workshare.msnos.usvc_client.commands.SetHelloApiDelay;
+import com.workshare.msnos.usvc_client.commands.StatusCommand;
+import com.workshare.msnos.usvc_client.commands.SubmenuCommand;
+import com.workshare.msnos.usvc_client.commands.TxRxUsvcCommand;
+import com.workshare.msnos.usvc_client.commands.UpdateCommand;
 import com.workshare.msnos.usvc_client.http.MiniHttpServer;
-
-import java.io.IOException;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.workshare.msnos.usvc_client.ui.Console;
+import com.workshare.msnos.usvc_client.ui.Menu;
 
 public class Server {
 
@@ -23,12 +39,14 @@ public class Server {
     private final Microservice micro;
     private final MiniHttpServer http;
     private final Command[] commands;
+    private final Menu menu;
 
     public Server(String name, int port) throws IOException {
         cloud = createMicrocloud();
         micro = new Microservice(name);
         http = new MiniHttpServer(cloud, micro, port);
         commands = createCommands(cloud, micro, http);
+        menu = new Menu(commands);
     }
     
     public void run() throws IOException {
@@ -36,9 +54,9 @@ public class Server {
         http.start();
         
         while (true) {
-            showMenu();
+            menu.show();
             try {
-                command().execute();
+                menu.selection().execute();
             } catch (Exception ex) {
                 logger.log(Level.WARNING, "An error occured!", ex);
             }
@@ -46,31 +64,6 @@ public class Server {
             sleep(500L);
         }
     }
-
-    private Command command() throws IOException {
-        String line = Console.in.readLine();
-
-        Command result;
-        try {
-            int index = Integer.parseInt(line);
-            result = commands[index];
-        } catch (Exception ignore) {
-            result = commands[0];
-        }
-
-        return result;
-    }
-
-    private void showMenu() {
-        System.out.println();
-        System.out.println("Action? ");
-        for (int i = 0; i < commands.length; i++) {
-            System.out.printf("%d) %s\n", i, commands[i].description());
-        }
-
-        System.out.flush();
-    }
-
     private void sleep(final long millis) {
         try {
             Thread.sleep(millis);
@@ -80,21 +73,29 @@ public class Server {
     }
     
     private Command[] createCommands(Microcloud cloud, Microservice usvc, MiniHttpServer http) {
+        Command[] advanced = {
+            new SendToCloudCommand(cloud, micro, Message.Type.DSC),
+            new SendToCloudCommand(cloud, micro, Message.Type.ENQ),
+            new TxRxUsvcCommand(cloud, micro, Message.Type.PIN, Message.Type.PON),
+            new TxRxUsvcCommand(cloud, micro, Message.Type.TRC, Message.Type.ACK),
+            new StatusCommand(cloud, micro, true),
+            new FlipHelloApiFaulty(http),
+            new FlipHealthcheckFaulty(http),
+            new SetHelloApiDelay(http),
+            new LogControl("protocol"),
+            new LogControl("routing"),
+        };
+        
         Command[] commands = {
             new StatusCommand(cloud, micro, false),
             new JoinCommand(cloud, micro, http.apis()),
             new LeaveCommand(micro),
-            new SendToCloudCommand(cloud, micro, Message.Type.DSC),
-            new SendToCloudCommand(cloud, micro, Message.Type.ENQ),
-            new PingAllCommand(cloud, micro),
-            new TxRxUsvcCommand(cloud, micro, Message.Type.PIN, Message.Type.PON),
-            new TxRxUsvcCommand(cloud, micro, Message.Type.TRC, Message.Type.ACK),
             new RingsCommand(cloud, micro),
             new UpdateCommand(cloud),
-            new StatusCommand(cloud, micro, true),
-
-            new LogControl("protocol"),
-            new LogControl("routing"),
+            new ListEndpointsCommand(cloud),
+            new PingAllCommand(cloud, micro),
+            new SubmenuCommand("advanced...", advanced),
+            
             new ExitCommand(new LeaveCommand(micro)),
         };
         

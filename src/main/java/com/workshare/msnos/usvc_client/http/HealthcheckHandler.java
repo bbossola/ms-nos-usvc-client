@@ -9,6 +9,8 @@ import com.sun.net.httpserver.HttpHandler;
 
 @SuppressWarnings("restriction")
 public class HealthcheckHandler implements HttpHandler {
+ 
+    private volatile boolean faulty = false;
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -16,15 +18,28 @@ public class HealthcheckHandler implements HttpHandler {
         responseHeaders.add("Content-Type", "application/json" );
 
         if (exchange.getRequestMethod().equalsIgnoreCase("HEAD")) {
-            exchange.sendResponseHeaders ( 200 , -1);
+            exchange.sendResponseHeaders ( statusCode() , -1);
         } else {
-            byte[] content = "{\"result\":\"ok\"}".getBytes();
+            byte[] content = statusText().getBytes();
     
-            exchange.sendResponseHeaders ( 200, content.length);
+            exchange.sendResponseHeaders ( statusCode(), content.length);
 
             final OutputStream responseBody = exchange.getResponseBody();
             responseBody.write(content);
             responseBody.close();
         }
+    }
+
+    private String statusText() {
+        String ok = faulty ? "FAIL" : "ok";
+        return "{\"result\":\""+ok+"\"}";
+    }
+
+    private int statusCode() {
+        return faulty ? 500 : 200;
+    }
+
+    public void setFaulty(boolean faultyStatus) {
+        this.faulty = faultyStatus;
     }
 }

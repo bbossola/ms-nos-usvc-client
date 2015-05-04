@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 import ch.qos.logback.classic.Level;
 
 import com.workshare.msnos.usvc_client.Command;
-import com.workshare.msnos.usvc_client.Console;
+import com.workshare.msnos.usvc_client.ui.Console;
 
 public class LogControl implements Command {
 
@@ -13,6 +13,7 @@ public class LogControl implements Command {
 
     public LogControl(String name) {
         this.name = name;
+        setCurrentLevel(Level.INFO);
     }
     
 	@Override

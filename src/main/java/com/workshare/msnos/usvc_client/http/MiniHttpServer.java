@@ -19,15 +19,21 @@ public class MiniHttpServer {
 
     public static final String URI_ADMIN_MESSAGES = "/admin/messages";
 
-    private HttpServer httpServer;
-    private RestApi[] apis;
+    private final HttpServer httpServer;
+    private final RestApi[] apis;
+
+    private final HealthcheckHandler healthcheckHandler;
+    private final GreeterHandler greeterHandler;
 
     public MiniHttpServer(Microcloud cloud, Microservice micro, int port) throws IOException {
+        healthcheckHandler = new HealthcheckHandler();
+        greeterHandler = new GreeterHandler(micro);
+
         httpServer = HttpServer.create(new InetSocketAddress(port), 0);
         httpServer.setExecutor(Executors.newCachedThreadPool());
+        httpServer.createContext(URI_HEALTH, healthcheckHandler);
+        httpServer.createContext(URI_GREET, greeterHandler);
         httpServer.createContext(URI_WASSUP, new WassupHandler(micro));
-        httpServer.createContext(URI_HEALTH, new HealthcheckHandler());
-        httpServer.createContext(URI_GREET, new GreeterHandler(micro));
         httpServer.createContext(URI_MSNOS, new MsnosHandler(cloud));
         
         apis = new RestApi[] {
@@ -50,5 +56,17 @@ public class MiniHttpServer {
 
     public void stop() {
         httpServer.stop(0);
+    }
+    
+    public void setFaulty(boolean faulty) {
+        healthcheckHandler.setFaulty(faulty);
+    }
+    
+    public void setHelloFaulty(boolean faulty) {
+        greeterHandler.setFaulty(faulty);
+    }
+
+    public void setHelloDelayInSeconds(long seconds) {
+        greeterHandler.setDelay(seconds);
     }
 }

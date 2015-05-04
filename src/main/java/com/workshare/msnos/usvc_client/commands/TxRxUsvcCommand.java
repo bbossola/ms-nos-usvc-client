@@ -14,7 +14,7 @@ import com.workshare.msnos.usvc.IMicroservice;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc_client.Command;
-import com.workshare.msnos.usvc_client.Console;
+import com.workshare.msnos.usvc_client.ui.Console;
 
 public class TxRxUsvcCommand implements Command {
 

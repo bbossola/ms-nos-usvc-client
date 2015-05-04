@@ -1,7 +1,7 @@
 package com.workshare.msnos.usvc_client.commands;
 
 import com.workshare.msnos.usvc_client.Command;
-import com.workshare.msnos.usvc_client.Console;
+import com.workshare.msnos.usvc_client.ui.Console;
 
 public class ExitCommand implements Command {
 
