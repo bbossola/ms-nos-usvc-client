@@ -25,11 +25,13 @@ public class RingsCommand implements Command {
 
     private final Microcloud cloud;
     private final Microservice micro;
+    private final Console console;
     
-    public RingsCommand(Microcloud ucloud, Microservice micro) {
+    public RingsCommand(Console console, Microcloud ucloud, Microservice micro) {
         super();
         this.cloud = ucloud;
         this.micro = micro;
+        this.console = console;
     }
 
     @Override
@@ -43,16 +45,17 @@ public class RingsCommand implements Command {
         Cloud grid = cloud.getCloud();
         final Map<Ring, Set<Agent>> rings = createRingMap(grid.getRemoteAgents(), grid.getLocalAgents());
         
-        Console.out.println("Number of rings: " + rings.size());
+        console.out().println("Number of rings: " + rings.size());
+        console.out().println();
         for (Ring ring : rings.keySet()) {
-            Console.out.println("- Ring: " + ring);
+            console.out().println("- Ring: " + ring);
             Set<Agent> agents = rings.get(ring);
             for (Agent agent : agents) {
                 dump("    ", agent);
             }
         }
 
-        Console.out.println();
+        console.out().println();
     }
 
     private Map<Ring, Set<Agent>> createRingMap(Collection<? extends Agent>... agents_array) {
@@ -79,21 +82,21 @@ public class RingsCommand implements Command {
 
     private void dump(final String prefix, final Agent agent) {
 
-        Console.out.println(prefix + "Agent: " + agent.getIden().getUUID());
+        console.out().println(prefix + "Agent: " + agent.getIden().getUUID());
        
         IMicroservice uservice = findMicroservice(agent);
         if (uservice != null)
-            Console.out.println(prefix + "  UService: " + uservice.getName());
+            console.out().println(prefix + "  UService: " + uservice.getName());
 
-        Console.out.println(prefix + "  Last seen: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date(agent.getAccessTime())));
+        console.out().println(prefix + "  Last seen: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date(agent.getAccessTime())));
 
         final Set<Endpoint> points = agent.getEndpoints();
-        Console.out.println(prefix + "  Endpoints: " + points.size());
+        console.out().println(prefix + "  Endpoints: " + points.size());
         for (Endpoint ep : points) {
-            Console.out.println(prefix + "    " + ep);
+            console.out().println(prefix + "    " + ep);
         }
 
-        Console.out.println();
+        console.out().println();
     }
 
     private IMicroservice findMicroservice(Agent agent) {

@@ -12,7 +12,10 @@ import java.util.Set;
 import com.workshare.msnos.core.Agent;
 import com.workshare.msnos.core.Cloud;
 import com.workshare.msnos.core.RemoteAgent;
+import com.workshare.msnos.core.geo.LocationFactory;
+import com.workshare.msnos.core.protocols.ip.AddressResolver;
 import com.workshare.msnos.core.protocols.ip.Endpoint;
+import com.workshare.msnos.core.protocols.ip.Network;
 import com.workshare.msnos.usvc.IMicroservice;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
@@ -23,12 +26,16 @@ import com.workshare.msnos.usvc_client.ui.Console;
 
 public class StatusCommand implements Command {
 
+    private final static AddressResolver ADDRESS_RESOLVER = new AddressResolver();
+
     private final Microservice usvc;
     private final Microcloud cloud;
     private final boolean detailed;
+    private final Console console;
 
-    public StatusCommand(Microcloud ucloud, Microservice usvc, boolean detailed) {
+    public StatusCommand(Console console, Microcloud ucloud, Microservice usvc, boolean detailed) {
         super();
+        this.console = console;
         this.usvc = usvc;
         this.cloud = ucloud;
         this.detailed = detailed;
@@ -42,53 +49,69 @@ public class StatusCommand implements Command {
     @Override
     public void execute() throws Exception {
 
-        Console.out.println();
-        Console.out.print("= Local microservice");
-        Console.out.print(" - Joined: " + ((usvc.getCloud() == null) ? "NO": "Yes"));
-        Console.out.println();
+        if (detailed) 
+            showIPInformation();
+        
+        console.out().println();
+        console.out().print("= Local microservice");
+        console.out().print(" - Joined: " + ((usvc.getCloud() == null) ? "NO": "Yes"));
+        console.out().println();
         dump("", usvc, true);
 
         List<RemoteMicroservice> remoteServices = cloud.getMicroServices();
-        Console.out.println("= Remote microservices: " + remoteServices.size());
+        console.out().println("= Remote microservices: " + remoteServices.size());
         for (RemoteMicroservice microService : remoteServices) {
             dump("  ", microService, false);
         }
-        Console.out.println();
+        console.out().println();
 
         if (detailed) {
             Cloud grid = cloud.getCloud();
             final Collection<RemoteAgent> remoteAgents = grid.getRemoteAgents();
-            Console.out.println("= Remote Agents: " + remoteAgents.size());
+            console.out().println("= Remote Agents: " + remoteAgents.size());
             for (Agent agent : remoteAgents) {
                 dump("  ", agent);
             }
         }
     }
 
+    private void showIPInformation() {
+        console.out().println("= IP status: ");
+        final Network publicIP = ADDRESS_RESOLVER.findPublicIP();
+        final Network externalIP = ADDRESS_RESOLVER.findRouterIP();
+        console.out().println("- public:   "+publicIP+" (location: "+findLocation(publicIP)+")");
+        console.out().println("- external: "+externalIP+" (location: "+findLocation(externalIP)+")");
+    }
+
+    private String findLocation(Network net) {
+        final String hostString = (net == null ? null : net.getHostString());
+        return LocationFactory.DEFAULT.make(hostString).toString();
+    }
+
     private void dump(String prefix, IMicroservice usvc, boolean withAgentDetails) {
         final Agent agent = usvc.getAgent();
 
-        Console.out.print(prefix + "Name: " + usvc.getName());
-        Console.out.print(" - Location: " + usvc.getLocation());
-        Console.out.print(" - Agent: " + agent.getIden().getUUID());
-        Console.out.println();
+        console.out().print(prefix + "Name: " + usvc.getName());
+        console.out().print(" - Location: " + usvc.getLocation());
+        console.out().print(" - Agent: " + agent.getIden().getUUID());
+        console.out().println();
 
         if (withAgentDetails) {
-            Console.out.println(prefix + "- Last seen: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date(agent.getAccessTime())));
+            console.out().println(prefix + "- Last seen: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date(agent.getAccessTime())));
             final Set<Endpoint> points = agent.getEndpoints();
-            Console.out.println(prefix + "- Endpoints: " + points.size());
+            console.out().println(prefix + "- Endpoints: " + points.size());
             for (Endpoint ep : points) {
-                Console.out.println(prefix + "  - " + ep);
+                console.out().println(prefix + "  - " + ep);
             }
         }
 
         List<RestApi> apis = listApis(usvc);
-        Console.out.println(prefix + "- Apis: " + apis.size());
+        console.out().println(prefix + "- Apis: " + apis.size());
         for (RestApi api : apis) {
             String isfaulty = api.isFaulty() ? " (faulty)" : "";
-            Console.out.println(prefix + "  - " + api.getPath() + ":" + isfaulty+ " ["+api.getUrl()+"]");
+            console.out().println(prefix + "  - " + api.getPath() + ":" + isfaulty+ " ["+api.getUrl()+"]");
         }
-        Console.out.println();
+        console.out().println();
     }
 
     private List<RestApi> listApis(IMicroservice usvc) {
@@ -107,16 +130,16 @@ public class StatusCommand implements Command {
 
         final IMicroservice micro = findMicroservice(agent);
 
-        Console.out.println(prefix + "Agent: " + agent.getIden().getUUID() + " (usvc: "+(micro == null ? "n/a" : micro.getName())+")");
-        Console.out.println(prefix + "  Last seen: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date(agent.getAccessTime())));
+        console.out().println(prefix + "Agent: " + agent.getIden().getUUID() + " (usvc: "+(micro == null ? "n/a" : micro.getName())+")");
+        console.out().println(prefix + "  Last seen: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(new Date(agent.getAccessTime())));
 
         final Set<Endpoint> points = agent.getEndpoints();
-        Console.out.println(prefix + "  Endpoints: " + points.size());
+        console.out().println(prefix + "  Endpoints: " + points.size());
         for (Endpoint ep : points) {
-            Console.out.println(prefix + "    " + ep);
+            console.out().println(prefix + "    " + ep);
         }
 
-        Console.out.println();
+        console.out().println();
     }
 
     private IMicroservice findMicroservice(Agent agent) {

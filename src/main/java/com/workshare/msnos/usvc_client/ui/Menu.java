@@ -12,20 +12,20 @@ public class Menu {
     }
 
     public void show() {
-        Console.out.println();
-        Console.out.println("Action? ");
+        SysConsole.out.println();
+        SysConsole.out.println("Action? ");
         for (int i = 0; i < commands.length; i++) {
-            Console.out.printf("%d) %s\n", i, commands[i].description());
+            SysConsole.out.printf("%d) %s\n", i, commands[i].description());
         }
 
-        Console.out.flush();
+        SysConsole.out.flush();
     }
 
     public Command selection() {
 
         Command result;
         try {
-            String line = Console.in.readLine();
+            String line = SysConsole.in.readLine();
             int index = Integer.parseInt(line);
             result = commands[index];
         } catch (Exception ignore) {

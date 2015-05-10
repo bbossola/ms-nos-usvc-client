@@ -6,7 +6,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.workshare.msnos.core.Cloud;
+import com.workshare.msnos.core.Cloud.Listener;
 import com.workshare.msnos.core.Message;
+import com.workshare.msnos.core.Message.Type;
 import com.workshare.msnos.core.MsnosException;
 import com.workshare.msnos.core.security.KeysStore;
 import com.workshare.msnos.core.security.Signer;
@@ -28,8 +30,8 @@ import com.workshare.msnos.usvc_client.commands.SubmenuCommand;
 import com.workshare.msnos.usvc_client.commands.TxRxUsvcCommand;
 import com.workshare.msnos.usvc_client.commands.UpdateCommand;
 import com.workshare.msnos.usvc_client.http.MiniHttpServer;
-import com.workshare.msnos.usvc_client.ui.Console;
 import com.workshare.msnos.usvc_client.ui.Menu;
+import com.workshare.msnos.usvc_client.ui.SysConsole;
 
 public class Server {
 
@@ -49,9 +51,41 @@ public class Server {
         menu = new Menu(commands);
     }
     
-    public void run() throws IOException {
-        
+    public Server init() {
         http.start();
+        return this;
+    }
+
+    public void runHeadless() throws Exception {
+        SysConsole.out.println("Running join command...");
+        new JoinCommand(cloud, micro, http.apis()).execute();
+        SysConsole.out.println("Done - Running in headless mode\n");
+        dumpStatus();
+        
+        cloud.addListener(new Listener() {
+            @Override
+            public void onMessage(Message message) {
+                if (message.getType() == Type.PRS || message.getType() == Type.FLT || message.getType() == Type.QNE)
+                    dumpStatus();
+            }
+        });
+        
+        waitPolitelyForever();
+    }
+
+    private synchronized void dumpStatus() {
+        try {
+            SysConsole.out.println("\n------------------------------------------------------------------------------------------------------------------------------");
+            new StatusCommand(SysConsole.get(), cloud, micro, true).execute();
+        } catch (Exception ignore) {
+        }
+    }
+    
+    private void waitPolitelyForever() throws IOException {
+        System.in.read();
+    }
+
+    public void runWithConsole() {
         
         while (true) {
             menu.show();
@@ -64,6 +98,7 @@ public class Server {
             sleep(500L);
         }
     }
+    
     private void sleep(final long millis) {
         try {
             Thread.sleep(millis);
@@ -78,19 +113,19 @@ public class Server {
             new SendToCloudCommand(cloud, micro, Message.Type.ENQ),
             new TxRxUsvcCommand(cloud, micro, Message.Type.PIN, Message.Type.PON),
             new TxRxUsvcCommand(cloud, micro, Message.Type.TRC, Message.Type.ACK),
-            new StatusCommand(cloud, micro, true),
-            new FlipHelloApiFaulty(http),
-            new FlipHealthcheckFaulty(http),
+            new StatusCommand(SysConsole.get(), cloud, micro, true),
+            new FlipHelloApiFaulty(SysConsole.get(), http),
+            new FlipHealthcheckFaulty(SysConsole.get(), http),
             new SetHelloApiDelay(http),
             new LogControl("protocol"),
             new LogControl("routing"),
         };
         
         Command[] commands = {
-            new StatusCommand(cloud, micro, false),
+            new StatusCommand(SysConsole.get(), cloud, micro, false),
             new JoinCommand(cloud, micro, http.apis()),
             new LeaveCommand(micro),
-            new RingsCommand(cloud, micro),
+            new RingsCommand(SysConsole.get(), cloud, micro),
             new UpdateCommand(cloud),
             new ListEndpointsCommand(cloud),
             new PingAllCommand(cloud, micro),
@@ -106,11 +141,11 @@ public class Server {
         String signid = getSecurityId();
         Cloud icloud;
         if (signid != null) {
-            Console.out.println("ATTENTION! Using secured cloud by id '"+signid+"'");
+            SysConsole.out.println("ATTENTION! Using secured cloud by id '"+signid+"'");
             icloud = new Cloud(new UUID(111, 222), signid);
         }
         else {
-            Console.out.println("Using open cloud :)");
+            SysConsole.out.println("Using open cloud :)");
             icloud = new Cloud(new UUID(111, 222));
         }
 
@@ -128,4 +163,5 @@ public class Server {
 
         return res;
     }
+
 }

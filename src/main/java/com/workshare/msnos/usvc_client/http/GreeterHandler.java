@@ -16,12 +16,14 @@ public class GreeterHandler implements HttpHandler {
     private static final Logger log = Logger.getLogger("com.workshare");
 
     private final Microservice usvc;
+    private final String extra;
 
     private volatile boolean faulty = false;
     private volatile long delayInSeconds = 0l;
 
-    GreeterHandler(Microservice usvc) {
+    GreeterHandler(Microservice usvc, String extra) {
         this.usvc = usvc;
+        this.extra = extra;
     }
     
     @Override
@@ -38,7 +40,7 @@ public class GreeterHandler implements HttpHandler {
         
         if (!faulty) {
             String text = sayHello(getQueryParameter(exchange, "name", "anonymous"), usvc);
-            respond(exchange, text, "text/plain", 200);
+            respond(exchange, text+extra+"\n", "text/plain", 200);
         } else {
             respond(exchange, "BOOM!", "text/plain", 500);
         }
@@ -83,4 +85,7 @@ public class GreeterHandler implements HttpHandler {
         this.delayInSeconds = seconds;
     }
 
+    public boolean isFaulty() {
+        return this.faulty;
+    }
 }

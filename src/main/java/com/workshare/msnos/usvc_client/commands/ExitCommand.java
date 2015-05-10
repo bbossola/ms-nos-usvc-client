@@ -1,7 +1,7 @@
 package com.workshare.msnos.usvc_client.commands;
 
 import com.workshare.msnos.usvc_client.Command;
-import com.workshare.msnos.usvc_client.ui.Console;
+import com.workshare.msnos.usvc_client.ui.SysConsole;
 
 public class ExitCommand implements Command {
 
@@ -19,13 +19,13 @@ public class ExitCommand implements Command {
 	@Override
 	public void execute() throws Exception {
 	    try {
-	        Console.out.println("Running exit commands");
+	        SysConsole.out.println("Running exit commands");
 	        for (Command command: commands) {
-	            Console.out.println("- "+command.description());
+	            SysConsole.out.println("- "+command.description());
 	            command.execute();
 	        }
 	    } finally {
-	        Console.out.println("\nExiting, thanks for all the fish :)");
+	        SysConsole.out.println("\nExiting, thanks for all the fish :)");
     	    System.exit(0);
 	    }
 	}

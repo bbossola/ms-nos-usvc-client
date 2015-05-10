@@ -6,12 +6,12 @@ import com.workshare.msnos.usvc_client.ui.Console;
 
 public class FlipHelloApiFaulty implements Command {
 
+    private final Console console;
     private final MiniHttpServer http;
 
-    private volatile boolean faulty = false;
-    
-    public FlipHelloApiFaulty(MiniHttpServer http) {
+    public FlipHelloApiFaulty(Console console, MiniHttpServer http) {
         this.http = http;
+        this.console = console;
     }
 
     @Override
@@ -21,10 +21,9 @@ public class FlipHelloApiFaulty implements Command {
 
     @Override
     public void execute() throws Exception {
-        final boolean status = !faulty;
-        Console.out.println("Setting hello API to " + (status ? "FAULTY" : "okay"));
+        final boolean status = !http.isHelloFaulty();
+        console.out().println("Setting hello API to " + (status ? "FAULTY" : "okay"));
         http.setHelloFaulty(status);
-        faulty = status;
     }
 
 }

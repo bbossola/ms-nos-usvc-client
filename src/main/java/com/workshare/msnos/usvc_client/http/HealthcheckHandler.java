@@ -42,4 +42,8 @@ public class HealthcheckHandler implements HttpHandler {
     public void setFaulty(boolean faultyStatus) {
         this.faulty = faultyStatus;
     }
+
+    public boolean isFaulty() {
+        return this.faulty;
+    }
 }

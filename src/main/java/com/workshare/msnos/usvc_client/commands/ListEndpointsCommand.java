@@ -9,7 +9,7 @@ import com.workshare.msnos.core.protocols.ip.Endpoints;
 import com.workshare.msnos.core.protocols.ip.www.WWWGateway;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc_client.Command;
-import com.workshare.msnos.usvc_client.ui.Console;
+import com.workshare.msnos.usvc_client.ui.SysConsole;
 
 public class ListEndpointsCommand implements Command {
 
@@ -30,15 +30,15 @@ public class ListEndpointsCommand implements Command {
     public void execute() throws Exception {
 
         final Set<Gateway> gates = cloud.getGateways();
-        Console.out.println("Gates: "+gates.size());
+        SysConsole.out.println("Gates: "+gates.size());
         for (Gateway gate : gates) {
             if (gate instanceof WWWGateway)
                 continue;
             
             Endpoints endpoints = gate.endpoints();
-            Console.out.println("  "+gate.name()+" gate:");
+            SysConsole.out.println("  "+gate.name()+" gate:");
             for (Endpoint endpoint : endpoints.all()) {
-                Console.out.println("    "+endpoint);
+                SysConsole.out.println("    "+endpoint);
             }
         }
     }

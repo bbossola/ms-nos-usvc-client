@@ -14,7 +14,7 @@ import com.workshare.msnos.usvc.IMicroservice;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc_client.Command;
-import com.workshare.msnos.usvc_client.ui.Console;
+import com.workshare.msnos.usvc_client.ui.SysConsole;
 
 public class TxRxUsvcCommand implements Command {
 
@@ -71,29 +71,29 @@ public class TxRxUsvcCommand implements Command {
     }
     
     public void doExecute() throws Exception {
-        Console.out.print("Enter the name of the agent: ");
-        Console.out.flush();
-        String name = Console.in.readLine().trim();
+        SysConsole.out.print("Enter the name of the agent: ");
+        SysConsole.out.flush();
+        String name = SysConsole.in.readLine().trim();
 
         IMicroservice target = find(name);
         if (target == null) {
-            Console.out.println("Sorry, target ["+name+" not found!");
+            SysConsole.out.println("Sorry, target ["+name+" not found!");
             return;
         }
         
         received.clear();
         
         Agent agent = target.getAgent();
-        Console.out.println("Sending "+tosend+" to service "+name+" on agent "+agent.getIden().getUUID());
+        SysConsole.out.println("Sending "+tosend+" to service "+name+" on agent "+agent.getIden().getUUID());
         final Message tx = new MessageBuilder(tosend, usvc.getAgent(), agent).make();
         final Receipt receipt = ucloud.send(tx);
 
-        Console.out.println("Message sent, waiting for PONG back...");
+        SysConsole.out.println("Message sent, waiting for PONG back...");
         Message rx = null;
         long end = System.currentTimeMillis() + 20000L;
         while(end > System.currentTimeMillis()) {
-            Console.out.println("= Gates: "+receipt.getGate());
-            Console.out.println("= Status: "+receipt.getStatus());
+            SysConsole.out.println("= Gates: "+receipt.getGate());
+            SysConsole.out.println("= Status: "+receipt.getStatus());
 
             while((rx=received.poll()) != null)
                 if (rx.getFrom().equals(agent.getIden())) {
@@ -101,9 +101,9 @@ public class TxRxUsvcCommand implements Command {
             }
             
             if (rx != null) {
-                Console.out.println("= Answer received! \n"+rx+"\n");
+                SysConsole.out.println("= Answer received! \n"+rx+"\n");
             } else {
-                Console.out.println("Waiting for answer...");
+                SysConsole.out.println("Waiting for answer...");
             }
  
             if (rx != null && receipt.getStatus() == Status.DELIVERED)

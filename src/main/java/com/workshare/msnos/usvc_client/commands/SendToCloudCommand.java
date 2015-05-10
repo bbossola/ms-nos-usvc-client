@@ -6,7 +6,7 @@ import com.workshare.msnos.core.MessageBuilder;
 import com.workshare.msnos.usvc.Microcloud;
 import com.workshare.msnos.usvc.Microservice;
 import com.workshare.msnos.usvc_client.Command;
-import com.workshare.msnos.usvc_client.ui.Console;
+import com.workshare.msnos.usvc_client.ui.SysConsole;
 
 public class SendToCloudCommand implements Command {
 
@@ -31,11 +31,11 @@ public class SendToCloudCommand implements Command {
         Message message;
         if (usvc.getAgent().getCloud() == null) {
             message = new MessageBuilder(type, cloud.getCloud(), cloud.getCloud()).make();
-            Console.out.println("Sending message from the cloud");
+            SysConsole.out.println("Sending message from the cloud");
         }
         else {
             message = new MessageBuilder(type, usvc.getAgent(), cloud.getCloud()).make();
-            Console.out.println("Sending message from the agent");
+            SysConsole.out.println("Sending message from the agent");
         }
         cloud.send(message);
     }
