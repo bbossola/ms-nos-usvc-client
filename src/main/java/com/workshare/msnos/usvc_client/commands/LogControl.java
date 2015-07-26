@@ -13,7 +13,6 @@ public class LogControl implements Command {
 
     public LogControl(String name) {
         this.name = name;
-        setCurrentLevel(Level.WARN);
     }
     
 	@Override

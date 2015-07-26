@@ -7,7 +7,7 @@
         </encoder>
     </appender>
 
-    <logger name="protocol" level="DEBUG" additivity="false">
+    <logger name="protocol" level="ERROR" additivity="false">
         <appender-ref ref="proto.appender"/>
     </logger>
 
@@ -19,7 +19,7 @@
         </encoder>
     </appender>
 
-    <logger name="routing" level="DEBUG" additivity="false">
+    <logger name="routing" level="ERROR" additivity="false">
         <appender-ref ref="routing.appender"/>
     </logger>
 
